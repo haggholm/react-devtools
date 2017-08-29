@@ -38,6 +38,7 @@ if (window.document) {
 
 function connectToDevTools(options: ?ConnectOptions) {
   var {
+    protocol = 'ws',
     host = 'localhost',
     port = 8097,
     resolveRNStyle = null,
@@ -58,7 +59,7 @@ function connectToDevTools(options: ?ConnectOptions) {
 
   var messageListeners = [];
   var closeListeners = [];
-  var uri = 'ws://' + host + ':' + port;
+  var uri = protocol + '://' + host + ':' + port;
   var ws = new window.WebSocket(uri);
   ws.onclose = handleClose;
   ws.onerror = handleClose;

@@ -109,8 +109,10 @@ function initialize(socket) {
 }
 
 var restartTimeout = null;
-function startServer(port = 8097) {
-  var httpServer = require('http').createServer();
+function startServer(port = 8097, httpsOptions = null) {
+  var httpServer = httpsOptions ?
+    require('http2').createServer(httpsOptions) :
+    require('http').createServer();
   var server = new ws.Server({server: httpServer});
   var connected = false;
   server.on('connection', (socket) => {
@@ -138,7 +140,7 @@ function startServer(port = 8097) {
   server.on('error', (e) => {
     onError(e);
     log.error('Failed to start the DevTools server', e);
-    restartTimeout = setTimeout(() => startServer(port), 1000);
+    restartTimeout = setTimeout(() => startServer(port, httpsOptions), 1000);
   });
 
   var backendFile = fs.readFileSync(
@@ -152,7 +154,7 @@ function startServer(port = 8097) {
   httpServer.on('error', (e) => {
     onError(e);
     onStatusChange('Failed to start the server.');
-    restartTimeout = setTimeout(() => startServer(port), 1000);
+    restartTimeout = setTimeout(() => startServer(port, httpsOptions), 1000);
   });
 
   httpServer.listen(port, () => {

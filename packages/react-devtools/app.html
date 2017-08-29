@@ -79,6 +79,7 @@
         </div>
         <script>
             var port = process.env.PORT || 8097;
+            var protocol = process.env.SSL_CERT ? 'https' : 'http';
             var localIp = require('ip').address();
             var $ = document.querySelector.bind(document);
             function selectAll() {
@@ -87,8 +88,8 @@
             }
             var $localhost = $('#localhost');
             var $byIp = $('#byip');
-            $localhost.value = '<' + 'script src="http://localhost:' + port + '"><' + '/script>';
-            $byIp.value = '<' + 'script src="http://' + localIp + ':' + port + '"><' + '/script>';
+            $localhost.value = '<' + 'script src="' + protocol + '://localhost:' + port + '"><' + '/script>';
+            $byIp.value = '<' + 'script src="' + protocol + '://' + localIp + ':' + port + '"><' + '/script>';
             $localhost.onclick = selectAll;
             $byIp.onclick = selectAll;
 
@@ -101,13 +102,22 @@
                     '\n\nDid you run `npm run build` and `npm install` in packages/react-devtools-core?'
                 );
             }
+
+            var httpsOpts = null;
+            if (process.env.SSL_CERT) {
+            	httpsOpts = {
+								key: require('fs').readFileSync(process.env.SSL_KEY, 'utf8'),
+								cert: require('fs').readFileSync(process.env.SSL_CERT, 'utf8'),
+							}
+						}
+
             window.devtools = devtools;
             window.server = devtools
                 .setContentDOMNode(document.getElementById('container'))
                 .setStatusListener(function(status) {
                     document.getElementById('loading-status').innerText = status;
                 })
-                .startServer(port);
+                .startServer(port, httpsOpts);
         </script>
     </body>
 </html>
