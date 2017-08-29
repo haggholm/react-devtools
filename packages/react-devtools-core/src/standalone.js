@@ -148,7 +148,8 @@ function startServer(port = 8097, httpsOptions = null) {
   );
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
-    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
+    var opts = process.env.SSL_CERT ? JSON.stringify({ protocol: 'wss' }) : null;
+    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools('+opts+');');
   });
 
   httpServer.on('error', (e) => {
